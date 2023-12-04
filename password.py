@@ -38,4 +38,3 @@ while True:
         password_hash = hash_password(password)
         print(f"Le hash du mot de passe:\n{password_hash}")
         break
-
