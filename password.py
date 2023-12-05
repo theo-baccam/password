@@ -9,6 +9,18 @@ import hashlib
 
 import json
 
+
+def file_reader():
+    try:
+        with open("password.json") as file:
+            password_list_file = file.read()
+
+        password_list = json.loads(password_list_file)
+    except (json.JSONDecodeError, FileNotFoundError):
+        with open("./password.json", "w") as file:
+            password_list_file = file.write(password_list_file)
+        password_list = json.loads(password_list_file)
+
 # Le menu principal
 def menu():
     prompt = input(
@@ -22,25 +34,24 @@ def menu():
 
 def view_password(password_list):
     for key, value in password_list.items():
-        print(
-            f"\nNom: {key}"
-            f"\nHash: {value}"
+        print(f"\nNom: {key}"
+              f"\nHash: {value}"
         )
     return ""
 
 
 # Prompt pour obtenir le mot de passe, et dire à l'utilisateur si c'est valide.
-def get_valid_password(dict):
+def get_valid_password(password_list):
     name = input("\nNom:")
     password = getpass.getpass("Mot de passe: ")
     password_hash = hash_password(password)
 
-    if name in dict:
+    if name in password_list:
         return "\nCe nom existe déjà\n"
     elif not is_valid(password):
         return "\nLe mot de passe n'est pas valide\n"
     else:
-        dict[name] = password_hash
+        password_list[name] = password_hash
         return (
             f"\nLe mot de passe est valide!\n"
             f"Nom: {name}\n"
@@ -48,10 +59,9 @@ def get_valid_password(dict):
             f"{password_hash}\n"
         )
 
-def save_password(dict):
-    if dict == {}:
-        return "Il n'y a rien à sauvegarder."
-    password_history_json = json.dumps(dict, indent=4)
+
+def save_password(password_list):
+    password_history_json = json.dumps(password_list, indent=4)
     with open("password.json", "w") as file:
         file.write(f"{password_history_json}\n")
         return "Saving..."
@@ -74,14 +84,8 @@ def hash_password(password):
     sha256.update(password.encode("ascii"))
     return sha256.hexdigest()
 
-
-with open("password.json") as file:
-    password_list_file = file.read()
-
-password_list = json.loads(password_list_file)
-print(type(password_list))
-if not isinstance(password_list, dict):
-    password_list = {}
+password_list = {}
+file_reader()
 
 # Boucle principale
 while True:
