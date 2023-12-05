@@ -8,6 +8,29 @@ import getpass
 import hashlib
 
 
+# Le menu principal
+def menu():
+    prompt = input(
+        "1) Afficher hash mots de passe\n" "2) Nouveau mot de passe\n" "3) Quitter\n"
+    )
+    return prompt
+
+
+# Prompt pour obtenir le mot de passe, et dire à l'utilisateur si c'est valide.
+def get_valid_password():
+    password = getpass.getpass("\nEntrez un mot de passe: ")
+
+    if not is_valid(password):
+        return "Le mot de passe n'est pas valide"
+    else:
+        password_hash = hash_password(password)
+        return (
+            f"Le mot de passe est valide!\n"
+            f"Le hash du mot de passe:\n"
+            f"{password_hash}\n"
+        )
+
+
 # Permet de vérifier si le mot de passe qui est entré correspond aux critères.
 def is_valid(password):
     return (
@@ -19,7 +42,7 @@ def is_valid(password):
     )
 
 
-# Pour encoder en SHA-256.
+# Pour encoder le mot de passe en SHA-256.
 def hash_password(password):
     sha256 = hashlib.sha256()
     sha256.update(password.encode("ascii"))
@@ -28,13 +51,16 @@ def hash_password(password):
 
 # Boucle principale
 while True:
-    password = getpass.getpass("Entrez un mot de passe: ")
-
-    if not is_valid(password):
-        print("Le mot de passe n'est pas valide")
-        continue
-    else:
-        print("Le mot de passe est valide!")
-        password_hash = hash_password(password)
-        print(f"Le hash du mot de passe:\n{password_hash}")
+    try:
+        choice = menu()
+        if choice == "2":
+            output = get_valid_password()
+            print(output)
+        if choice == "3":
+            print("Quitting...")
+            break
+    except KeyboardInterrupt:
+        print("\nQuitting...")
         break
+    except Exception as e:
+        print(f"Erreur: {e}")
