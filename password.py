@@ -12,14 +12,15 @@ import json
 
 def file_reader():
     try:
-        with open("password.json") as file:
+        with open("./password.json") as file:
             password_list_file = file.read()
-
-        password_list = json.loads(password_list_file)
+            return json.loads(password_list_file)
     except (json.JSONDecodeError, FileNotFoundError):
         with open("./password.json", "w") as file:
-            password_list_file = file.write(password_list_file)
-        password_list = json.loads(password_list_file)
+            empty = {}
+            password_list_file = file.write(empty)
+            return password_list_file
+
 
 # Le menu principal
 def menu():
@@ -84,8 +85,9 @@ def hash_password(password):
     sha256.update(password.encode("ascii"))
     return sha256.hexdigest()
 
-password_list = {}
-file_reader()
+
+password_list = file_reader()
+
 
 # Boucle principale
 while True:
