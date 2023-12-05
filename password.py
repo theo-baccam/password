@@ -8,6 +8,9 @@ import getpass
 import hashlib
 
 
+password_history = {}
+
+
 # Le menu principal
 def menu():
     prompt = input(
@@ -16,16 +19,28 @@ def menu():
     return prompt
 
 
-# Prompt pour obtenir le mot de passe, et dire à l'utilisateur si c'est valide.
-def get_valid_password():
-    password = getpass.getpass("\nEntrez un mot de passe: ")
+def view_password(dict):
+    for name, password_hash in dict.items():
+        if name == None:
+            break
+        print(f"\nNom: {name}\n" f"Hash: {password_hash}\n")
 
-    if not is_valid(password):
-        return "Le mot de passe n'est pas valide"
+
+# Prompt pour obtenir le mot de passe, et dire à l'utilisateur si c'est valide.
+def get_valid_password(dict):
+    name = input("\nNom:")
+    password = getpass.getpass("Mot de passe: ")
+    password_hash = hash_password(password)
+
+    if name in dict:
+        return "\nCe nom existe déjà\n"
+    elif not is_valid(password):
+        return "\nLe mot de passe n'est pas valide\n"
     else:
-        password_hash = hash_password(password)
+        dict[name] = password_hash
         return (
-            f"Le mot de passe est valide!\n"
+            f"\nLe mot de passe est valide!\n"
+            f"Nom: {name}\n"
             f"Le hash du mot de passe:\n"
             f"{password_hash}\n"
         )
@@ -53,12 +68,16 @@ def hash_password(password):
 while True:
     try:
         choice = menu()
-        if choice == "2":
-            output = get_valid_password()
+        if choice == "1":
+            view_password(password_history)
+        elif choice == "2":
+            output = get_valid_password(password_history)
             print(output)
-        if choice == "3":
+        elif choice == "3":
             print("Quitting...")
             break
+        else:
+            print("Option inconnue")
     except KeyboardInterrupt:
         print("\nQuitting...")
         break
