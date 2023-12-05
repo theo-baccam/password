@@ -20,10 +20,13 @@ def menu():
     return prompt
 
 
-def view_password():
-    with open("password.json", "r") as file:
-        json_file = file.read()
-    print(json_file)
+def view_password(password_list):
+    for key, value in password_list.items():
+        print(
+            f"\nNom: {key}"
+            f"\nHash: {value}"
+        )
+    return ""
 
 
 # Prompt pour obtenir le mot de passe, et dire à l'utilisateur si c'est valide.
@@ -85,7 +88,8 @@ while True:
     try:
         choice = menu()
         if choice == "1":
-            print(password_list)
+            output = view_password(password_list)
+            print(output)
         elif choice == "2":
             output = get_valid_password(password_list)
             print(output)
