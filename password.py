@@ -38,6 +38,14 @@ def menu():
     return prompt
 
 
+def menu_password_creation():
+    prompt = input(
+            "1) Manuel\n"
+            "2) Génération automatique\n"
+    )
+    return prompt
+
+
 def view_password(password_list):
     for key, value in password_list.items():
         print(f"\nNom: {key}" f"\nHash: {value}")
@@ -98,6 +106,8 @@ def is_valid(password):
 
 
 def password_gen():
+    name = input("\nNom:")
+
     lowercase = string.ascii_lowercase
     uppercase = string.ascii_uppercase
     digits = string.digits
@@ -118,7 +128,8 @@ def password_gen():
     password_list = [character for character in password]
     random.shuffle(password_list)
     password_shuffled = "".join(password_list)
-    return password_shuffled
+    password_hash = hash_password(password_shuffled)
+    return [name, password_hash]
 
 
 # Pour encoder le mot de passe en SHA-256.
@@ -139,21 +150,25 @@ while True:
             output = view_password(password_list)
             print(output)
         elif choice == "2":
-            password_output = get_valid_password(password_list)
-            if isinstance(password_output, str):
-                print(password_output)
-            else:
+            choice = menu_password_creation()
+            if choice == "1":
+                password_output = get_valid_password(password_list)
+                if isinstance(password_output, str):
+                    print(password_output)
+                else:
+                    output = register_password(password_output)
+                    print(output)
+            elif choice == "2":
+                password_output = password_gen()
                 output = register_password(password_output)
                 print(output)
+
         elif choice == "3":
             output = save_password(password_list)
             print(output)
         elif choice == "4":
             print("Quitting...")
             break
-        elif choice == "pass":
-            output = password_gen()
-            print(output)
         else:
             print("Option inconnue")
     except KeyboardInterrupt:
