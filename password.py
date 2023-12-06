@@ -9,6 +9,8 @@ import hashlib
 
 import json
 
+import random
+
 
 def file_reader():
     try:
@@ -95,6 +97,30 @@ def is_valid(password):
     )
 
 
+def password_gen():
+    lowercase = string.ascii_lowercase
+    uppercase = string.ascii_uppercase
+    digits = string.digits
+    punctuation = string.punctuation
+    mosh_pit = lowercase + uppercase + digits + punctuation
+
+    password  = ""
+
+    password += random.choice(lowercase)
+    password += random.choice(uppercase)
+    password += random.choice(digits)
+    password += random.choice(punctuation)
+
+    i = 0
+    while i < 4:
+        password += random.choice(mosh_pit)
+        i += 1
+    password_list = [character for character in password]
+    random.shuffle(password_list)
+    password_shuffled = "".join(password_list)
+    return password_shuffled
+
+
 # Pour encoder le mot de passe en SHA-256.
 def hash_password(password):
     sha256 = hashlib.sha256()
@@ -125,6 +151,9 @@ while True:
         elif choice == "4":
             print("Quitting...")
             break
+        elif choice == "pass":
+            output = password_gen()
+            print(output)
         else:
             print("Option inconnue")
     except KeyboardInterrupt:
