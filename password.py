@@ -12,14 +12,17 @@ import json
 
 def file_reader():
     try:
-        with open("./password.json") as file:
+        with open("./password.json", "r") as file:
             password_list_file = file.read()
             return json.loads(password_list_file)
     except (json.JSONDecodeError, FileNotFoundError):
         with open("./password.json", "w") as file:
             empty = {}
-            password_list_file = file.write(empty)
-            return password_list_file
+            empty_json = json.dumps(empty)
+            file.write(empty_json)
+        with open("./password.json", "r") as file:
+            password_list_file = file.read()
+            return json.loads(password_list_file)
 
 
 # Le menu principal
@@ -52,13 +55,26 @@ def get_valid_password(password_list):
     elif not is_valid(password):
         return "\nLe mot de passe n'est pas valide\n"
     else:
+        return [name, password_hash]
+
+
+def register_password(input_list):
+    name = input_list[0]
+    password_hash = input_list[1]
+    for key, value in password_list.items():
+        if password_hash == value:
+            conflict = True
+        else:
+            conflict = False
+    if conflict == False:
         password_list[name] = password_hash
-        return (
-            f"\nLe mot de passe est valide!\n"
+        return(
+            f"\nCe mot de passe est valide\n"
             f"Nom: {name}\n"
-            f"Le hash du mot de passe:\n"
-            f"{password_hash}\n"
+            f"Hash: {password_hash}\n"
         )
+    else:
+        return "\nCe mot de passe existe déjà\n"
 
 
 def save_password(password_list):
@@ -97,8 +113,12 @@ while True:
             output = view_password(password_list)
             print(output)
         elif choice == "2":
-            output = get_valid_password(password_list)
-            print(output)
+            password_output = get_valid_password(password_list)
+            if isinstance(password_output, str):
+                print(password_output)
+            else:
+                output = register_password(password_output)
+                print(output)
         elif choice == "3":
             output = save_password(password_list)
             print(output)
