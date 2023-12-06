@@ -38,9 +38,7 @@ def menu():
 
 def view_password(password_list):
     for key, value in password_list.items():
-        print(f"\nNom: {key}"
-              f"\nHash: {value}"
-        )
+        print(f"\nNom: {key}" f"\nHash: {value}")
     return ""
 
 
@@ -61,14 +59,16 @@ def get_valid_password(password_list):
 def register_password(input_list):
     name = input_list[0]
     password_hash = input_list[1]
+    conflict = False
     for key, value in password_list.items():
         if password_hash == value:
             conflict = True
+            continue
         else:
             conflict = False
     if conflict == False:
         password_list[name] = password_hash
-        return(
+        return (
             f"\nCe mot de passe est valide\n"
             f"Nom: {name}\n"
             f"Hash: {password_hash}\n"
