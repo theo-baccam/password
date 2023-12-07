@@ -14,16 +14,18 @@ import random
 
 # Pour lire le fichier .json, ou le créer si il n'existe pas
 def file_reader():
-    for times in range(2):
-        try:
-            with open("./password.json", "r") as file:
-                password_list_file = file.read()
-                return json.loads(password_list_file)
-        except (json.JSONDecodeError, FileNotFoundError):
-            with open("./password.json", "w") as file:
-                empty = {}
-                empty_json = json.dumps(empty)
-                file.write(empty_json)
+    try:
+        with open("./password.json", "r") as file:
+            password_list_file = file.read()
+            return json.loads(password_list_file)
+    except (json.JSONDecodeError, FileNotFoundError):
+        with open("./password.json", "w") as file:
+            empty = {}
+            empty_json = json.dumps(empty)
+            file.write(empty_json)
+        with open("./password.json", "r") as file:
+            password_list_file = file.read()
+            return json.loads(password_list_file)
 
 
 # Le menu principal
@@ -72,9 +74,18 @@ def register_password(input_list):
     for key, value in password_list.items():
         if password_hash == value:
             conflict = True
-            return "\nCe mot de passe existe déjà\n"
-    password_list[name] = password_hash
-    return f"\nCe mot de passe est valide\n" f"Nom: {name}\n" f"Hash: {password_hash}\n"
+            continue
+        else:
+            conflict = False
+    if conflict == False:
+        password_list[name] = password_hash
+        return (
+            f"\nCe mot de passe est valide\n"
+            f"Nom: {name}\n"
+            f"Hash: {password_hash}\n"
+        )
+    else:
+        return "\nCe mot de passe existe déjà\n"
 
 
 # Pour sauvegarder les mots de passe dans le fichier .json
@@ -108,16 +119,16 @@ def password_gen():
 
     password = ""
 
-    password = (
-        random.choice(lowercase)
-        + random.choice(uppercase)
-        + random.choice(digits)
-        + random.choice(punctuation)
-    )
+    password += random.choice(lowercase)
+    password += random.choice(uppercase)
+    password += random.choice(digits)
+    password += random.choice(punctuation)
 
-    password_list = [
-        password and random.choice(combined) for i in range(random.randint(8, 12))
-    ]
+    i = 0
+    while i < 4:
+        password += random.choice(combined)
+        i += 1
+    password_list = [character for character in password]
     random.shuffle(password_list)
     password_shuffled = "".join(password_list)
     password_hash = hash_password(password_shuffled)
@@ -134,38 +145,42 @@ def hash_password(password):
 # La liste des mots de passe
 password_list = file_reader()
 
+def option_1():
+    output = view_password(password_list)
+    print(output)
+
+def option_2():
+    choice = menu_password_creation()
+    if choice == "1":
+        password_output = get_valid_password(password_list)
+        if isinstance(password_output, str):
+            print(password_output)
+        else:
+            output = register_password(password_output)
+            print(output)
+    elif choice == "2":
+        password_output = password_gen()
+        output = register_password(password_output)
+        print(output)
+
+
+def option_3():
+    output = save_password(password_list)
+    print(output)
+
 
 # Boucle principale
 while True:
+    available_options = {
+        "1": option_1(),
+        "2": lambda: option_2(),
+        "3": option_3(),
+    }
     try:
         # Menu principal
         choice = menu()
-
-        # Affichage mots de passe
-        if choice == "1":
-            output = view_password(password_list)
-            print(output)
-
-        # Création mot de passe
-        elif choice == "2":
-            choice = menu_password_creation()
-            if choice == "1":
-                password_output = get_valid_password(password_list)
-                if isinstance(password_output, str):
-                    print(password_output)
-                else:
-                    output = register_password(password_output)
-                    print(output)
-            elif choice == "2":
-                password_output = password_gen()
-                output = register_password(password_output)
-                print(output)
-
-        # Pour sauvegarder les mots de apsse
-        elif choice == "3":
-            output = save_password(password_list)
-            print(output)
-
+        if choice in available_options:
+            available_options[choice]()
         # Pour quitter
         elif choice == "4":
             print("Quitting...")
