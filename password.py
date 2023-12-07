@@ -12,6 +12,7 @@ import json
 import random
 
 
+# Pour lire le fichier .json, ou le créer si il n'existe pas
 def file_reader():
     try:
         with open("./password.json", "r") as file:
@@ -38,18 +39,17 @@ def menu():
     return prompt
 
 
-def menu_password_creation():
-    prompt = input(
-            "1) Manuel\n"
-            "2) Génération automatique\n"
-    )
-    return prompt
-
-
+# Pour voir les mots de passe crées
 def view_password(password_list):
     for key, value in password_list.items():
         print(f"\nNom: {key}" f"\nHash: {value}")
     return ""
+
+
+# Menu pour choisir le mode de création de mot de passe
+def menu_password_creation():
+    prompt = input("1) Manuel\n" "2) Génération automatique\n")
+    return prompt
 
 
 # Prompt pour obtenir le mot de passe, et dire à l'utilisateur si c'est valide.
@@ -66,6 +66,7 @@ def get_valid_password(password_list):
         return [name, password_hash]
 
 
+# Pour vérifier si il y a pas de conflits hash, et d'enregistrer le mot de passe si ce n'est pas le cas.
 def register_password(input_list):
     name = input_list[0]
     password_hash = input_list[1]
@@ -87,6 +88,7 @@ def register_password(input_list):
         return "\nCe mot de passe existe déjà\n"
 
 
+# Pour sauvegarder les mots de passe dans le fichier .json
 def save_password(password_list):
     password_history_json = json.dumps(password_list, indent=4)
     with open("password.json", "w") as file:
@@ -105,6 +107,7 @@ def is_valid(password):
     )
 
 
+# Pour générer un mot de passe selon les critères
 def password_gen():
     name = input("\nNom:")
 
@@ -112,9 +115,9 @@ def password_gen():
     uppercase = string.ascii_uppercase
     digits = string.digits
     punctuation = string.punctuation
-    mosh_pit = lowercase + uppercase + digits + punctuation
+    combined = lowercase + uppercase + digits + punctuation
 
-    password  = ""
+    password = ""
 
     password += random.choice(lowercase)
     password += random.choice(uppercase)
@@ -123,7 +126,7 @@ def password_gen():
 
     i = 0
     while i < 4:
-        password += random.choice(mosh_pit)
+        password += random.choice(combined)
         i += 1
     password_list = [character for character in password]
     random.shuffle(password_list)
@@ -139,16 +142,22 @@ def hash_password(password):
     return sha256.hexdigest()
 
 
+# La liste des mots de passe
 password_list = file_reader()
 
 
 # Boucle principale
 while True:
     try:
+        # Menu principal
         choice = menu()
+
+        # Affichage mots de passe
         if choice == "1":
             output = view_password(password_list)
             print(output)
+
+        # Création mot de passe
         elif choice == "2":
             choice = menu_password_creation()
             if choice == "1":
@@ -163,16 +172,25 @@ while True:
                 output = register_password(password_output)
                 print(output)
 
+        # Pour sauvegarder les mots de apsse
         elif choice == "3":
             output = save_password(password_list)
             print(output)
+
+        # Pour quitter
         elif choice == "4":
             print("Quitting...")
             break
+
+        # En cas d'option inconnue
         else:
             print("Option inconnue")
+
+    # Pour quitter en faisant CTRL+C
     except KeyboardInterrupt:
         print("\nQuitting...")
         break
+
+    # Pour afficher les erreurs sans arrêter le programme.
     except Exception as e:
         print(f"Erreur: {e}")
